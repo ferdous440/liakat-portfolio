@@ -54,7 +54,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:0 6%;height:68px;dis
 .photo-frame{position:relative;width:240px;height:240px}
 .photo-ring-outer{position:absolute;inset:-12px;border-radius:50%;background:conic-gradient(var(--cyan) 0deg,var(--purple) 120deg,var(--pink) 240deg,var(--cyan) 360deg);animation:spinRing 6s linear infinite;padding:2px}
 .photo-ring-inner{width:100%;height:100%;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center}
-.photo-img{width:228px;height:228px;border-radius:50%;object-fit:cover;object-position:top center;display:block}
+.photo-img{width:228px;height:228px;border-radius:50%;object-fit:cover;object-position:center 10%;display:block;transform:rotate(0deg)}
 .photo-badge{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,var(--cyan),var(--purple));color:#fff;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;padding:7px 20px;border-radius:30px;white-space:nowrap;box-shadow:0 4px 20px rgba(0,229,255,0.3)}
 .photo-dots{position:absolute;top:-20px;right:-30px;display:grid;grid-template-columns:repeat(4,8px);gap:6px}
 .photo-dots span{width:8px;height:8px;border-radius:50%;background:var(--purple);opacity:0.4}
@@ -404,11 +404,11 @@ footer span{background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-
     </div>
     <div class="hero-stats">
       <div class="stat-item">
-        <div class="stat-num">3+</div>
-        <div class="stat-label">Projects</div>
+        <div class="stat-num">3</div>
+        <div class="stat-label">Projects Built</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num">10+</div>
+        <div class="stat-num">15+</div>
         <div class="stat-label">Technologies</div>
       </div>
       <div class="stat-item">
@@ -786,24 +786,38 @@ const obs = new IntersectionObserver((entries) => {
 reveals.forEach(el => obs.observe(el));
 
 // Typed text effect for hero role
-const roles = ['Full Stack Developer', 'React Specialist', 'Node.js Engineer', 'UI/UX Enthusiast'];
-let ri = 0, ci = 0, deleting = false;
+const roles = ['Full Stack Developer', 'React Developer', 'Node.js Engineer', 'UI/UX Enthusiast'];
+let ri = 0, ci = roles[0].length, deleting = false, paused = false;
 const roleEl = document.querySelector('.hero-role');
 if (roleEl) {
+  roleEl.innerHTML = '<span id="typed-word">Full Stack Developer</span> · <strong>React & Node.js</strong> Specialist';
+  function getTyped() { return document.getElementById('typed-word'); }
   function type() {
+    if (paused) return;
     const cur = roles[ri];
     if (!deleting) {
-      roleEl.innerHTML = cur.slice(0, ci + 1) + ' · <strong>React & Node.js</strong> Specialist';
       ci++;
-      if (ci === cur.length) { deleting = true; setTimeout(type, 2000); return; }
+      getTyped().textContent = cur.slice(0, ci);
+      if (ci === cur.length) {
+        deleting = true; paused = true;
+        setTimeout(() => { paused = false; type(); }, 2800);
+        return;
+      }
     } else {
-      roleEl.innerHTML = cur.slice(0, ci - 1) + ' · <strong>React & Node.js</strong> Specialist';
       ci--;
-      if (ci === 0) { deleting = false; ri = (ri + 1) % roles.length; }
+      getTyped().textContent = cur.slice(0, ci);
+      if (ci === 0) {
+        deleting = false;
+        ri = (ri + 1) % roles.length;
+        paused = true;
+        setTimeout(() => { paused = false; type(); }, 500);
+        return;
+      }
     }
-    setTimeout(type, deleting ? 60 : 100);
+    setTimeout(type, deleting ? 48 : 100);
   }
-  setTimeout(type, 1200);
+  paused = true;
+  setTimeout(() => { paused = false; deleting = true; type(); }, 3000);
 }
 
 // Counter animation for stats
